@@ -93,7 +93,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-primary-foreground/20 mt-8 pt-8 text-center text-sm">
-          <p>&copy; {new Date().getFullYear()} Paradise Tours. Todos los derechos reservados.</p>
+          <p>&copy; {new Date().getFullYear()} Paradise Tours. Created By SH Computers SRL</p>
         </div>
       </div>
     </footer>

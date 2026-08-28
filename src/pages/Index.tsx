@@ -7,6 +7,7 @@ import { Reviews } from "@/components/Reviews";
 import { Footer } from "@/components/Footer";
 import { useTours, useToursByCategory } from "@/hooks/useTours";
 import { useCombos } from "@/hooks/useCombos";
+import { CalendarCheck, BadgePercent, ShieldCheck } from "lucide-react";
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
@@ -86,21 +87,27 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div className="space-y-2">
-              <div className="text-4xl mb-4">🏖️</div>
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary">
+                <CalendarCheck className="h-8 w-8 text-white" />
+              </div>
               <h3 className="text-xl font-semibold text-foreground">Reserva Fácil</h3>
               <p className="text-muted-foreground">
                 Proceso simple y rápido en pocos clics
               </p>
             </div>
             <div className="space-y-2">
-              <div className="text-4xl mb-4">💯</div>
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary">
+                <BadgePercent className="h-8 w-8 text-white" />
+              </div>
               <h3 className="text-xl font-semibold text-foreground">Mejor Precio</h3>
               <p className="text-muted-foreground">
                 Precios especiales y descuentos exclusivos
               </p>
             </div>
             <div className="space-y-2">
-              <div className="text-4xl mb-4">⭐</div>
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary">
+                <ShieldCheck className="h-8 w-8 text-white" />
+              </div>
               <h3 className="text-xl font-semibold text-foreground">Experiencia Garantizada</h3>
               <p className="text-muted-foreground">
                 Tours con las mejores calificaciones
