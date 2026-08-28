@@ -1,21 +1,24 @@
 import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { bookingsService } from "@/lib/supabase/bookings";
+import { useTours } from "@/hooks/useTours";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, ShoppingBag, Calendar, Tag } from "lucide-react";
+import { CountryCodeSelect } from "@/components/CountryCodeSelect";
+import { countryCodes, DEFAULT_COUNTRY_ISO2 } from "@/lib/country-codes";
+import { Trash2, ShoppingBag, Calendar, Tag, Sparkles, Clock, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 const Cart = () => {
-  const { 
-    items, 
-    removeItem, 
-    totalPrice, 
+  const {
+    items,
+    removeItem,
+    totalPrice,
     clearCart,
     discountPercentage,
     discountAmount,
@@ -23,8 +26,10 @@ const Cart = () => {
     referralCode,
     referralUser
   } = useCart();
+  const { data: allTours } = useTours();
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [countryIso2, setCountryIso2] = useState(DEFAULT_COUNTRY_ISO2);
   const [bookingData, setBookingData] = useState({
     name: "",
     email: "",
@@ -32,23 +37,40 @@ const Cart = () => {
     notes: ""
   });
 
+  const cartTourIds = new Set(items.map((item) => item.tour.id));
+  const recommendedTours = (allTours ?? [])
+    .filter((tour) => !cartTourIds.has(tour.id))
+    .slice(0, 3);
+
+  const fullPhoneNumber = () => {
+    const dialCode = countryCodes.find((c) => c.iso2 === countryIso2)?.dialCode ?? "";
+    return `${dialCode}${bookingData.phone.replace(/\D/g, "")}`;
+  };
+
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    if (bookingData.phone.replace(/\D/g, "").length < 7) {
+      toast.error("Por favor ingresa un número de teléfono válido");
+      return;
+    }
+
+    const customerPhone = fullPhoneNumber();
+
     setIsSubmitting(true);
     try {
       // Crear reservas para cada item del carrito
       const bookingPromises = items.map((item) => {
-        const itemTotal = 
+        const itemTotal =
           item.tour.priceAdult * item.adults +
           item.tour.priceChild * item.children +
           item.tour.priceInfant * item.infants;
-        
+
         return bookingsService.create({
           tour_id: item.tour.id,
           customer_name: bookingData.name,
           customer_email: bookingData.email,
-          customer_phone: bookingData.phone,
+          customer_phone: customerPhone,
           booking_date: item.date,
           adults: item.adults,
           children: item.children,
@@ -77,7 +99,7 @@ const Cart = () => {
         ? `\n*Descuento aplicado: ${discountPercentage}% (-$${discountAmount.toFixed(2)})*` 
         : '';
       
-      const fullMessage = `*Nueva Reserva*\n\nNombre: ${bookingData.name}\nEmail: ${bookingData.email}\nTeléfono: ${bookingData.phone}\n\n*Tours:*\n${message}\n\n*Subtotal: $${totalPrice.toFixed(2)}*${discountText}\n*Total: $${finalPrice.toFixed(2)}*\n\nNotas: ${bookingData.notes}`;
+      const fullMessage = `*Nueva Reserva*\n\nNombre: ${bookingData.name}\nEmail: ${bookingData.email}\nTeléfono: ${customerPhone}\n\n*Tours:*\n${message}\n\n*Subtotal: $${totalPrice.toFixed(2)}*${discountText}\n*Total: $${finalPrice.toFixed(2)}*\n\nNotas: ${bookingData.notes}`;
       const whatsappUrl = `https://wa.me/1234567890?text=${encodeURIComponent(fullMessage)}`;
       
       window.open(whatsappUrl, "_blank");
@@ -180,6 +202,48 @@ const Cart = () => {
                 </Card>
               );
             })}
+
+            {/* Recommended tours */}
+            {recommendedTours.length > 0 && (
+              <div className="pt-6">
+                <div className="flex items-center gap-2 mb-3 text-muted-foreground">
+                  <Sparkles className="h-4 w-4" />
+                  <span className="text-sm font-medium">También te puede interesar</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {recommendedTours.map((tour) => (
+                    <Link key={tour.id} to={`/tour/${tour.id}`}>
+                      <Card className="group overflow-hidden hover:shadow-[var(--shadow-card)] transition-all">
+                        <div className="relative h-24 overflow-hidden">
+                          <img
+                            src={tour.image}
+                            alt={tour.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                        <CardContent className="p-3 space-y-1">
+                          <p className="text-sm font-medium line-clamp-1">{tour.title}</p>
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {tour.duration}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Star className="h-3 w-3 fill-accent text-accent" />
+                              {tour.rating}
+                            </span>
+                          </div>
+                          <p className="text-sm font-semibold text-primary">
+                            ${tour.priceAdult}
+                            <span className="text-xs font-normal text-muted-foreground">/adulto</span>
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Summary */}
@@ -287,14 +351,23 @@ const Cart = () => {
 
                         <div className="space-y-2">
                           <Label htmlFor="phone">Teléfono *</Label>
-                          <Input
-                            id="phone"
-                            type="tel"
-                            value={bookingData.phone}
-                            onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
-                            placeholder="+52 123 456 7890"
-                            required
-                          />
+                          <div className="flex gap-2">
+                            <CountryCodeSelect value={countryIso2} onChange={setCountryIso2} />
+                            <Input
+                              id="phone"
+                              type="tel"
+                              inputMode="numeric"
+                              value={bookingData.phone}
+                              onChange={(e) =>
+                                setBookingData({
+                                  ...bookingData,
+                                  phone: e.target.value.replace(/[^\d\s-]/g, ""),
+                                })
+                              }
+                              placeholder="849 710 8953"
+                              required
+                            />
+                          </div>
                         </div>
 
                         <div className="space-y-2">

@@ -5,11 +5,28 @@ import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Calendar as CalendarPicker } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
-import { Clock, Star, Users, Calendar, Minus, Plus, Check, Tag } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Clock,
+  Star,
+  Users,
+  CalendarIcon,
+  Minus,
+  Plus,
+  Check,
+  Tag,
+  User,
+  Baby,
+  ChevronDown,
+} from "lucide-react";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import type { ReactNode } from "react";
+
+const capitalizeFirst = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
 const TourDetail = () => {
   const { id } = useParams();
@@ -20,7 +37,8 @@ const TourDetail = () => {
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [travelersOpen, setTravelersOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -55,7 +73,7 @@ const TourDetail = () => {
       adults,
       children,
       infants,
-      date: selectedDate,
+      date: format(selectedDate, "yyyy-MM-dd"),
     });
 
     toast.success("Tour agregado al carrito");
@@ -73,35 +91,66 @@ const TourDetail = () => {
   
   const totalPrice = subtotal - discountAmount;
 
-  const Counter = ({
+  const totalTravelers = adults + children + infants;
+  const travelersSummary = () => {
+    const parts: string[] = [];
+    if (adults > 0) parts.push(`${adults} adulto${adults > 1 ? "s" : ""}`);
+    if (children > 0) parts.push(`${children} niño${children > 1 ? "s" : ""}`);
+    if (infants > 0) parts.push(`${infants} infante${infants > 1 ? "s" : ""}`);
+    return parts.length > 0 ? parts.join(", ") : "Selecciona viajeros";
+  };
+
+  const TravelerRow = ({
+    icon,
+    title,
+    subtitle,
+    priceLabel,
     value,
     onChange,
     min = 0,
-    label,
+    max = 20,
   }: {
+    icon: ReactNode;
+    title: string;
+    subtitle: string;
+    priceLabel: string;
     value: number;
     onChange: (v: number) => void;
     min?: number;
-    label: string;
+    max?: number;
   }) => (
-    <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-      <span className="font-medium">{label}</span>
-      <div className="flex items-center gap-3">
+    <div className="flex items-center justify-between gap-3 py-3">
+      <div className="flex items-center gap-3 min-w-0">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+          {icon}
+        </div>
+        <div className="min-w-0">
+          <p className="font-medium leading-tight">{title}</p>
+          <p className="text-xs text-muted-foreground truncate">{subtitle}</p>
+          <p className="text-xs font-semibold text-primary">{priceLabel}</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-3 shrink-0">
         <Button
+          type="button"
           variant="outline"
           size="icon"
+          className="h-8 w-8 rounded-full"
           onClick={() => onChange(Math.max(min, value - 1))}
           disabled={value <= min}
         >
-          <Minus className="h-4 w-4" />
+          <Minus className="h-3.5 w-3.5" />
         </Button>
-        <span className="w-8 text-center font-semibold">{value}</span>
+        <span className="w-5 text-center font-semibold tabular-nums">{value}</span>
         <Button
+          type="button"
           variant="outline"
           size="icon"
-          onClick={() => onChange(value + 1)}
+          className="h-8 w-8 rounded-full"
+          onClick={() => onChange(Math.min(max, value + 1))}
+          disabled={value >= max}
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-3.5 w-3.5" />
         </Button>
       </div>
     </div>
@@ -173,40 +222,110 @@ const TourDetail = () => {
               <CardHeader>
                 <CardTitle>Reserva tu Tour</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-5">
                 {/* Date Selection */}
                 <div className="space-y-2">
-                  <Label htmlFor="date" className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
+                  <span className="text-sm font-medium flex items-center gap-2">
+                    <CalendarIcon className="h-4 w-4" />
                     Fecha
-                  </Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    min={new Date().toISOString().split("T")[0]}
-                  />
+                  </span>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className={`w-full justify-between font-normal h-12 px-4 ${
+                          !selectedDate ? "text-muted-foreground" : ""
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <CalendarIcon className="h-4 w-4 shrink-0" />
+                          {selectedDate
+                            ? capitalizeFirst(format(selectedDate, "EEEE d 'de' MMMM, yyyy", { locale: es }))
+                            : "Selecciona una fecha"}
+                        </span>
+                        <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarPicker
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={setSelectedDate}
+                        disabled={{ before: new Date(new Date().setHours(0, 0, 0, 0)) }}
+                        locale={es}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
-                {/* Passenger Counters */}
-                <div className="space-y-3">
-                  <Counter
-                    value={adults}
-                    onChange={setAdults}
-                    min={0}
-                    label={`Adultos - $${(tour.priceAdult || 0).toFixed(2)}`}
-                  />
-                  <Counter
-                    value={children}
-                    onChange={setChildren}
-                    label={`Niños - $${(tour.priceChild || 0).toFixed(2)}`}
-                  />
-                  <Counter
-                    value={infants}
-                    onChange={setInfants}
-                    label={`Infantes - ${(tour.priceInfant || 0) === 0 ? "Gratis" : `$${(tour.priceInfant || 0).toFixed(2)}`}`}
-                  />
+                {/* Passenger Selector */}
+                <div className="space-y-2">
+                  <span className="text-sm font-medium flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Viajeros
+                  </span>
+                  <Popover open={travelersOpen} onOpenChange={setTravelersOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full justify-between font-normal h-12 px-4"
+                      >
+                        <span className="flex items-center gap-2 truncate">
+                          <Users className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{travelersSummary()}</span>
+                        </span>
+                        <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[320px] p-4 divide-y" align="start">
+                      <TravelerRow
+                        icon={<User className="h-5 w-5" />}
+                        title="Adultos"
+                        subtitle="13 años o más"
+                        priceLabel={`$${(tour.priceAdult || 0).toFixed(2)} c/u`}
+                        value={adults}
+                        onChange={setAdults}
+                        min={0}
+                      />
+                      <TravelerRow
+                        icon={<Users className="h-5 w-5" />}
+                        title="Niños"
+                        subtitle="2 a 12 años"
+                        priceLabel={`$${(tour.priceChild || 0).toFixed(2)} c/u`}
+                        value={children}
+                        onChange={setChildren}
+                        min={0}
+                      />
+                      <TravelerRow
+                        icon={<Baby className="h-5 w-5" />}
+                        title="Infantes"
+                        subtitle="Menores de 2 años"
+                        priceLabel={
+                          (tour.priceInfant || 0) === 0
+                            ? "Gratis"
+                            : `$${(tour.priceInfant || 0).toFixed(2)} c/u`
+                        }
+                        value={infants}
+                        onChange={setInfants}
+                        min={0}
+                      />
+                      <div className="pt-3">
+                        <Button
+                          type="button"
+                          className="w-full"
+                          onClick={() => setTravelersOpen(false)}
+                        >
+                          Listo
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  <p className="text-xs text-muted-foreground">
+                    {totalTravelers} {totalTravelers === 1 ? "viajero" : "viajeros"} en total
+                  </p>
                 </div>
 
                 {/* Price Summary */}
@@ -214,7 +333,7 @@ const TourDetail = () => {
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-3xl font-bold text-primary">
-                      ${totalPrice}
+                      ${totalPrice.toFixed(2)}
                     </span>
                   </div>
                   <Button
