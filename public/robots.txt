@@ -12,3 +12,6 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+# TODO: actualizar esta URL cuando exista un dominio real (ver src/lib/site-config.ts)
+Sitemap: https://www.tudominio.com/sitemap.xml

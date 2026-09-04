@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { toast } from "sonner";
 import { LogIn, Lock } from "lucide-react";
+import { Seo } from "@/components/Seo";
 
 const DashboardLogin = () => {
   const [referralCode, setReferralCode] = useState("");
@@ -43,6 +44,7 @@ const DashboardLogin = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Seo title="Acceso Administrador" description="Panel de administración de Paradise Tours." path="/dashboard/login" noIndex />
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-2">
           <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">

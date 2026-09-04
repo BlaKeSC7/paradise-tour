@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { CountryCodeSelect } from "@/components/CountryCodeSelect";
 import { countryCodes, DEFAULT_COUNTRY_ISO2 } from "@/lib/country-codes";
+import { Seo } from "@/components/Seo";
 import { Trash2, ShoppingBag, Calendar, Tag, Sparkles, Clock, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -117,6 +118,7 @@ const Cart = () => {
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+        <Seo title="Carrito de Compras" description="Tu carrito de reservas en Paradise Tours." path="/carrito" noIndex />
         <div className="text-center space-y-4">
           <ShoppingBag className="h-24 w-24 text-muted-foreground mx-auto" />
           <h2 className="text-2xl font-bold">Tu carrito está vacío</h2>
@@ -133,6 +135,7 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen bg-background py-8">
+      <Seo title="Carrito de Compras" description="Tu carrito de reservas en Paradise Tours." path="/carrito" noIndex />
       <div className="container mx-auto px-4">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Carrito de Compras</h1>

@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import { DashboardAuthProvider } from "@/contexts/DashboardAuthContext";
@@ -10,6 +11,9 @@ import { WhatsAppFloat } from "@/components/WhatsAppFloat";
 import Index from "./pages/Index";
 import TourDetail from "./pages/TourDetail";
 import Cart from "./pages/Cart";
+import Categorias from "./pages/Categorias";
+import Ofertas from "./pages/Ofertas";
+import ComboDetail from "./pages/ComboDetail";
 import Dashboard from "./pages/Dashboard";
 import DashboardLogin from "./pages/DashboardLogin";
 import { ProtectedRoute } from "./components/Dashboard/ProtectedRoute";
@@ -33,6 +37,7 @@ if (typeof window !== 'undefined') {
 }
 
 const App = () => (
+  <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <CartProvider>
@@ -64,7 +69,28 @@ const App = () => (
                   <WhatsAppFloat />
                 </>
               } />
-              
+              <Route path="/categorias" element={
+                <>
+                  <Navbar />
+                  <Categorias />
+                  <WhatsAppFloat />
+                </>
+              } />
+              <Route path="/ofertas" element={
+                <>
+                  <Navbar />
+                  <Ofertas />
+                  <WhatsAppFloat />
+                </>
+              } />
+              <Route path="/combo/:id" element={
+                <>
+                  <Navbar />
+                  <ComboDetail />
+                  <WhatsAppFloat />
+                </>
+              } />
+
               {/* Dashboard Routes */}
               <Route path="/dashboard/login" element={<DashboardLogin />} />
               <Route 
@@ -89,6 +115,7 @@ const App = () => (
       </CartProvider>
     </TooltipProvider>
   </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;

@@ -73,6 +73,4 @@ export const categories = [
   "Crucero",
   "Cultural",
   "Aventura",
-  "Familia",
-  "Romántico",
 ];

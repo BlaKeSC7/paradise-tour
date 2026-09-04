@@ -214,7 +214,7 @@ const TourManager = () => {
                     id="image"
                     value={formData.image}
                     onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                    placeholder="/src/assets/tour-image.jpg"
+                    placeholder="https://... (URL pública de la imagen)"
                   />
                   {formData.image && (
                     <img src={formData.image} alt="Preview" className="w-20 h-20 object-cover rounded" />

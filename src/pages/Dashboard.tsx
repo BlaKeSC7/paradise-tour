@@ -12,6 +12,7 @@ import { useTours } from "@/hooks/useTours";
 import { useBookings } from "@/hooks/useBookings";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { Seo } from "@/components/Seo";
 
 const Dashboard = () => {
   const { user, isAuthenticated, isLoading, logout, refreshUser } = useDashboardAuth();
@@ -47,6 +48,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo title="Dashboard de Administración" description="Panel de administración de Paradise Tours." path="/dashboard" noIndex />
       {/* Header */}
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4">

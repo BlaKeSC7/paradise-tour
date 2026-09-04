@@ -184,15 +184,15 @@ CREATE POLICY "Allow public update dashboard users" ON dashboard_users
   -- Insertar datos de ejemplo (opcional - solo si no existen)
   -- Usar ON CONFLICT para evitar errores si los datos ya existen
   INSERT INTO tours (id, title, description, category, image, duration, price_adult, price_child, price_infant, featured, includes, rating, reviews) VALUES
-    ('1', 'Snorkel en Arrecife de Coral', 'Explora el vibrante mundo submarino con peces tropicales, tortugas y arrecifes de coral espectaculares. Tour guiado con todo el equipo incluido.', 'Acuático', '/src/assets/tour-snorkeling.jpg', '4 horas', 89, 59, 0, true, '["Equipo de snorkel", "Guía certificado", "Refrigerios", "Transporte"]', 4.9, 234),
-    ('2', 'Paseo en Catamarán al Atardecer', 'Disfruta de un relajante paseo en catamarán mientras el sol se pone sobre el océano. Incluye bebidas y música en vivo.', 'Crucero', '/src/assets/tour-catamaran.jpg', '3 horas', 129, 89, 0, true, '["Bebidas ilimitadas", "Música en vivo", "Cena ligera", "Transporte"]', 5.0, 189),
-    ('3', 'Tour Ruinas Mayas', 'Viaja en el tiempo visitando antiguas ruinas mayas. Aprende sobre la fascinante historia y cultura con guías expertos.', 'Cultural', '/src/assets/tour-ruins.jpg', '6 horas', 99, 69, 0, true, '["Guía arqueólogo", "Entradas", "Almuerzo", "Transporte"]', 4.8, 312),
-    ('4', 'Aventura en la Selva - Tirolesa', 'Adrenalina pura volando entre los árboles en nuestras tirolesas de última generación. Incluye rappel y puentes colgantes.', 'Aventura', '/src/assets/tour-adventure.jpg', '5 horas', 119, 89, 0, true, '["Equipo de seguridad", "Instructor", "Refrigerios", "Transporte", "Fotos digitales"]', 4.9, 267)
+    ('1', 'Snorkel en Arrecife de Coral', 'Explora el vibrante mundo submarino con peces tropicales, tortugas y arrecifes de coral espectaculares. Tour guiado con todo el equipo incluido.', 'Acuático', '/images/tour-snorkeling.jpg', '4 horas', 89, 59, 0, true, '["Equipo de snorkel", "Guía certificado", "Refrigerios", "Transporte"]', 4.9, 234),
+    ('2', 'Paseo en Catamarán al Atardecer', 'Disfruta de un relajante paseo en catamarán mientras el sol se pone sobre el océano. Incluye bebidas y música en vivo.', 'Crucero', '/images/tour-catamaran.jpg', '3 horas', 129, 89, 0, true, '["Bebidas ilimitadas", "Música en vivo", "Cena ligera", "Transporte"]', 5.0, 189),
+    ('3', 'Tour Ruinas Mayas', 'Viaja en el tiempo visitando antiguas ruinas mayas. Aprende sobre la fascinante historia y cultura con guías expertos.', 'Cultural', '/images/tour-ruins.jpg', '6 horas', 99, 69, 0, true, '["Guía arqueólogo", "Entradas", "Almuerzo", "Transporte"]', 4.8, 312),
+    ('4', 'Aventura en la Selva - Tirolesa', 'Adrenalina pura volando entre los árboles en nuestras tirolesas de última generación. Incluye rappel y puentes colgantes.', 'Aventura', '/images/tour-adventure.jpg', '5 horas', 119, 89, 0, true, '["Equipo de seguridad", "Instructor", "Refrigerios", "Transporte", "Fotos digitales"]', 4.9, 267)
   ON CONFLICT (id) DO NOTHING;
 
   INSERT INTO combos (id, title, description, tour_ids, original_price, discounted_price, discount, image) VALUES
-    ('combo-1', 'Aventura Completa', 'Snorkel en Cozumel + Tour en Catamarán - El combo perfecto para disfrutar del mar', ARRAY['1', '2'], 180, 150, 17, '/src/assets/tour-snorkeling.jpg'),
-    ('combo-2', 'Cultura y Naturaleza', 'Ruinas Mayas + Aventura en la Selva - Descubre la historia y la naturaleza', ARRAY['3', '4'], 200, 165, 18, '/src/assets/tour-ruins.jpg')
+    ('combo-1', 'Aventura Completa', 'Snorkel en Arrecife de Coral + Tour en Catamarán - El combo perfecto para disfrutar del mar', ARRAY['1', '2'], 180, 150, 17, '/images/tour-snorkeling.jpg'),
+    ('combo-2', 'Cultura y Naturaleza', 'Ruinas Mayas + Aventura en la Selva - Descubre la historia y la naturaleza', ARRAY['3', '4'], 200, 165, 18, '/images/tour-ruins.jpg')
   ON CONFLICT (id) DO NOTHING;
 
   -- Insertar reseñas de ejemplo

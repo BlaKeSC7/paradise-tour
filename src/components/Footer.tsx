@@ -24,8 +24,18 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/cart" className="hover:text-accent transition-colors">
+                <Link to="/carrito" className="hover:text-accent transition-colors">
                   Carrito
+                </Link>
+              </li>
+              <li>
+                <Link to="/categorias" className="hover:text-accent transition-colors">
+                  Categorías
+                </Link>
+              </li>
+              <li>
+                <Link to="/ofertas" className="hover:text-accent transition-colors">
+                  Ofertas
                 </Link>
               </li>
               <li>
@@ -55,7 +65,7 @@ export const Footer = () => {
               </li>
               <li className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                <span>Playa del Carmen, México</span>
+                <span>Punta Cana, República Dominicana</span>
               </li>
             </ul>
           </div>

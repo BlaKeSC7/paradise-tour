@@ -3,33 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+
+    <!--
+      title/description/canonical/robots/OG/Twitter/JSON-LD de cada página se generan
+      en tiempo de ejecución con src/components/Seo.tsx (react-helmet-async) — a
+      propósito NO se duplican acá, porque Helmet agrega sus tags pero no borra
+      los que ya estaban en este HTML estático, y el navegador/crawler puede quedarse
+      con el primero (el genérico) en vez del específico de la página.
+      Este <title> es solo el que se ve en la fracción de segundo antes de que
+      React monte; Seo.tsx lo reemplaza enseguida.
+      ⚠️ El dominio real todavía no existe: ver el placeholder documentado en
+      src/lib/site-config.ts (también hay que actualizar public/robots.txt y
+      scripts/generate-sitemap.mjs cuando se registre uno).
+    -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    
-    <title>Paradise Tours | Reserva las Mejores Excursiones y Tours de Playa</title>
-    <meta name="description" content="Descubre y reserva los mejores tours en playas paradisíacas. Ofrecemos snorkel, paseos en catamarán, aventuras extremas y turismo cultural. Reserva segura y rápida." />
-    <meta name="keywords" content="tours, excursiones, playa, snorkel, catamarán, turismo, aventura, viajes, reservas de tours, vacaciones paradisíacas" />
+
+    <title>Paradise Tours</title>
+    <meta name="keywords" content="tours, excursiones, punta cana, snorkel, catamarán, turismo, aventura, viajes, reservas de tours, vacaciones paradisíacas" />
     <meta name="author" content="SH COMPUTERS" />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    <link rel="canonical" href="https://www.tudominio.com/" />
-
-    <meta property="og:locale" content="es_ES" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Paradise Tours | Reserva las Mejores Excursiones y Tours de Playa" />
-    <meta property="og:description" content="Descubre y reserva los mejores tours en playas paradisíacas. Snorkel, catamarán, aventuras y cultura con los expertos. Precios especiales." />
-    <meta property="og:url" content="https://www.tudominio.com/" />
-    <meta property="og:site_name" content="Paradise Tours" />
-    <meta property="og:image" content="https://www.tudominio.com/assets/og-image.jpg" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:type" content="image/jpeg" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Paradise Tours | Reserva las Mejores Excursiones y Tours de Playa" />
-    <meta name="twitter:description" content="Descubre y reserva los mejores tours en playas paradisíacas. Reserva rápida, fácil y segura." />
-    <meta name="twitter:image" content="https://www.tudominio.com/assets/og-image.jpg" />
   </head>
 
   <body>

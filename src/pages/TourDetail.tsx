@@ -25,6 +25,8 @@ import {
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import type { ReactNode } from "react";
+import { Seo } from "@/components/Seo";
+import { SITE_URL } from "@/lib/site-config";
 
 const capitalizeFirst = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
@@ -156,8 +158,43 @@ const TourDetail = () => {
     </div>
   );
 
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "TouristTrip",
+      name: tour.title,
+      description: tour.description,
+      image: tour.image.startsWith("http") ? tour.image : `${SITE_URL}${tour.image}`,
+      touristType: tour.category,
+      offers: {
+        "@type": "Offer",
+        price: tour.priceAdult,
+        priceCurrency: "USD",
+        availability: "https://schema.org/InStock",
+        url: `${SITE_URL}/tour/${tour.id}`,
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Inicio", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Categorías", item: `${SITE_URL}/categorias` },
+        { "@type": "ListItem", position: 3, name: tour.title, item: `${SITE_URL}/tour/${tour.id}` },
+      ],
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title={tour.title}
+        description={tour.description}
+        path={`/tour/${tour.id}`}
+        image={tour.image}
+        type="product"
+        jsonLd={jsonLd}
+      />
       {/* Hero Image */}
       <div className="relative h-[400px] md:h-[500px]">
         <img
