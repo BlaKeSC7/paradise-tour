@@ -1,4 +1,5 @@
 import { supabase } from '../supabase';
+import { SelectedExtra } from '@/types/tour';
 
 export interface Booking {
   id: string;
@@ -15,6 +16,7 @@ export interface Booking {
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   notes: string | null;
   referral_code: string | null;
+  extras?: SelectedExtra[];
   created_at?: string;
   updated_at?: string;
 }
@@ -31,16 +33,28 @@ export interface CreateBookingData {
   total_price: number;
   notes?: string;
   referral_code?: string;
+  extras?: SelectedExtra[];
 }
 
 export const bookingsService = {
   // Crear una nueva reserva
   async create(bookingData: CreateBookingData): Promise<Booking> {
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('bookings')
       .insert(bookingData)
       .select()
       .single();
+
+    // Si todavía no se corrió la migración que agrega la columna "extras",
+    // reintentamos sin ella para no romper la reserva completa por eso.
+    if (error?.code === '42703' && bookingData.extras) {
+      const { extras, ...withoutExtras } = bookingData;
+      ({ data, error } = await supabase
+        .from('bookings')
+        .insert(withoutExtras)
+        .select()
+        .single());
+    }
 
     if (error) {
       console.error('Error creating booking:', error);

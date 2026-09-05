@@ -82,7 +82,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     0
   );
 
-  const totalPrice = items.reduce((sum, item) => {
+  const toursSubtotal = items.reduce((sum, item) => {
     const tourTotal =
       item.tour.priceAdult * item.adults +
       item.tour.priceChild * item.children +
@@ -90,9 +90,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return sum + tourTotal;
   }, 0);
 
+  const extrasSubtotal = items.reduce((sum, item) => {
+    const itemExtrasTotal = (item.extras || []).reduce((s, extra) => s + extra.price, 0);
+    return sum + itemExtrasTotal;
+  }, 0);
+
+  // Incluye accesorios; el descuento por referido solo aplica sobre el precio del tour.
+  const totalPrice = toursSubtotal + extrasSubtotal;
+
   const referralCode = getReferralCode();
   const discountPercentage = referralUser?.discount_percentage || 0;
-  const discountAmount = (totalPrice * discountPercentage) / 100;
+  const discountAmount = (toursSubtotal * discountPercentage) / 100;
   const finalPrice = totalPrice - discountAmount;
 
   return (

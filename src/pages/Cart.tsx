@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { CountryCodeSelect } from "@/components/CountryCodeSelect";
 import { countryCodes, DEFAULT_COUNTRY_ISO2 } from "@/lib/country-codes";
 import { Seo } from "@/components/Seo";
-import { Trash2, ShoppingBag, Calendar, Tag, Sparkles, Clock, Star } from "lucide-react";
+import { Trash2, ShoppingBag, Calendar, Tag, Sparkles, Clock, Star, Backpack } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -48,6 +48,15 @@ const Cart = () => {
     return `${dialCode}${bookingData.phone.replace(/\D/g, "")}`;
   };
 
+  const getItemExtrasTotal = (item: (typeof items)[number]) =>
+    (item.extras || []).reduce((sum, extra) => sum + extra.price, 0);
+
+  const getItemTotal = (item: (typeof items)[number]) =>
+    item.tour.priceAdult * item.adults +
+    item.tour.priceChild * item.children +
+    item.tour.priceInfant * item.infants +
+    getItemExtrasTotal(item);
+
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -61,13 +70,8 @@ const Cart = () => {
     setIsSubmitting(true);
     try {
       // Crear reservas para cada item del carrito
-      const bookingPromises = items.map((item) => {
-        const itemTotal =
-          item.tour.priceAdult * item.adults +
-          item.tour.priceChild * item.children +
-          item.tour.priceInfant * item.infants;
-
-        return bookingsService.create({
+      const bookingPromises = items.map((item) =>
+        bookingsService.create({
           tour_id: item.tour.id,
           customer_name: bookingData.name,
           customer_email: bookingData.email,
@@ -76,24 +80,24 @@ const Cart = () => {
           adults: item.adults,
           children: item.children,
           infants: item.infants,
-          total_price: itemTotal,
+          total_price: getItemTotal(item),
           notes: bookingData.notes || null,
           referral_code: referralCode || null,
-        });
-      });
+          extras: item.extras || [],
+        })
+      );
 
       await Promise.all(bookingPromises);
 
       // También enviar por WhatsApp
       const message = items
-        .map(
-          (item) =>
-            `*${item.tour.title}*\nFecha: ${item.date}\nAdultos: ${item.adults}, Niños: ${item.children}, Infantes: ${item.infants}\nSubtotal: $${
-              item.tour.priceAdult * item.adults +
-              item.tour.priceChild * item.children +
-              item.tour.priceInfant * item.infants
-            }`
-        )
+        .map((item) => {
+          const extrasText =
+            item.extras && item.extras.length > 0
+              ? `\nAccesorios: ${item.extras.map((e) => `${e.name} (+$${e.price})`).join(", ")}`
+              : "";
+          return `*${item.tour.title}*\nFecha: ${item.date}\nAdultos: ${item.adults}, Niños: ${item.children}, Infantes: ${item.infants}${extrasText}\nSubtotal: $${getItemTotal(item)}`;
+        })
         .join("\n\n");
 
       const discountText = discountPercentage > 0 
@@ -148,10 +152,7 @@ const Cart = () => {
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => {
-              const itemTotal =
-                item.tour.priceAdult * item.adults +
-                item.tour.priceChild * item.children +
-                item.tour.priceInfant * item.infants;
+              const itemTotal = getItemTotal(item);
 
               return (
                 <Card key={item.tour.id}>
@@ -186,6 +187,16 @@ const Cart = () => {
                             </p>
                           )}
                         </div>
+                        {item.extras && item.extras.length > 0 && (
+                          <div className="text-sm text-muted-foreground space-y-0.5 pt-1 border-t">
+                            {item.extras.map((extra) => (
+                              <p key={extra.id} className="flex items-center gap-1">
+                                <Backpack className="h-3.5 w-3.5 shrink-0" />
+                                {extra.name} (+${extra.price.toFixed(2)})
+                              </p>
+                            ))}
+                          </div>
+                        )}
                       </div>
                       <div className="flex flex-row sm:flex-col items-center justify-between sm:justify-between gap-2">
                         <p className="text-2xl font-bold text-primary">${itemTotal}</p>
@@ -258,10 +269,7 @@ const Cart = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   {items.map((item) => {
-                    const itemTotal =
-                      item.tour.priceAdult * item.adults +
-                      item.tour.priceChild * item.children +
-                      item.tour.priceInfant * item.infants;
+                    const itemTotal = getItemTotal(item);
                     return (
                       <div key={item.tour.id} className="flex justify-between text-sm">
                         <span className="text-muted-foreground">{item.tour.title}</span>

@@ -63,8 +63,19 @@
     status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'cancelled', 'completed')),
     notes TEXT,
     referral_code TEXT,
+    extras JSONB DEFAULT '[]'::jsonb,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  );
+
+  -- Tabla de Accesorios/Recomendaciones opcionales por tour (ej. pasamontañas, pañuelos, etc.)
+  CREATE TABLE IF NOT EXISTS tour_extras (
+    id TEXT PRIMARY KEY,
+    tour_id TEXT NOT NULL REFERENCES tours(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
   );
 
 -- Tabla de Usuarios del Dashboard (Afiliados/Referidos)
@@ -104,6 +115,7 @@ CREATE TABLE IF NOT EXISTS dashboard_users (
   ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
   ALTER TABLE dashboard_users ENABLE ROW LEVEL SECURITY;
   ALTER TABLE referrals ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE tour_extras ENABLE ROW LEVEL SECURITY;
 
   -- Eliminar políticas existentes si existen (para evitar errores al re-ejecutar)
   DROP POLICY IF EXISTS "Allow public read access on tours" ON tours;
@@ -181,6 +193,10 @@ CREATE POLICY "Allow public update dashboard users" ON dashboard_users
   CREATE POLICY "Allow public read referrals" ON referrals
     FOR SELECT USING (true);
 
+  DROP POLICY IF EXISTS "Allow public read access on tour_extras" ON tour_extras;
+  CREATE POLICY "Allow public read access on tour_extras" ON tour_extras
+    FOR SELECT USING (true);
+
   -- Insertar datos de ejemplo (opcional - solo si no existen)
   -- Usar ON CONFLICT para evitar errores si los datos ya existen
   INSERT INTO tours (id, title, description, category, image, duration, price_adult, price_child, price_infant, featured, includes, rating, reviews) VALUES
@@ -193,6 +209,18 @@ CREATE POLICY "Allow public update dashboard users" ON dashboard_users
   INSERT INTO combos (id, title, description, tour_ids, original_price, discounted_price, discount, image) VALUES
     ('combo-1', 'Aventura Completa', 'Snorkel en Arrecife de Coral + Tour en Catamarán - El combo perfecto para disfrutar del mar', ARRAY['1', '2'], 180, 150, 17, '/images/tour-snorkeling.jpg'),
     ('combo-2', 'Cultura y Naturaleza', 'Ruinas Mayas + Aventura en la Selva - Descubre la historia y la naturaleza', ARRAY['3', '4'], 200, 165, 18, '/images/tour-ruins.jpg')
+  ON CONFLICT (id) DO NOTHING;
+
+  -- Insertar accesorios de ejemplo (editalos o agregá los tuyos desde el SQL Editor)
+  INSERT INTO tour_extras (id, tour_id, name, description, price) VALUES
+    ('extra-1', '1', 'Cámara acuática desechable', 'Llevate fotos bajo el agua sin arriesgar tu celular', 15),
+    ('extra-2', '1', 'Alquiler de traje de neopreno', 'Más comodidad y calor en el agua', 10),
+    ('extra-3', '2', 'Paquete de fotos profesionales', 'Sesión de fotos durante el paseo, con edición incluida', 25),
+    ('extra-4', '3', 'Guía privado', 'Tour exclusivo solo para tu grupo', 40),
+    ('extra-5', '3', 'Sombrero de sol', 'Protección extra durante el recorrido', 8),
+    ('extra-6', '4', 'Pasamontañas de protección', 'Protección facial para la tirolesa', 6),
+    ('extra-7', '4', 'Pañuelo/buff multiusos', 'Protección para cuello y rostro', 5),
+    ('extra-8', '4', 'Guantes de seguridad', 'Mejor agarre en tirolesas y rappel', 7)
   ON CONFLICT (id) DO NOTHING;
 
   -- Insertar reseñas de ejemplo

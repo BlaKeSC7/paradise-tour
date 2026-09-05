@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTour } from "@/hooks/useTours";
+import { useTourExtras } from "@/hooks/useTourExtras";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useCart } from "@/contexts/CartContext";
@@ -21,6 +23,7 @@ import {
   User,
   Baby,
   ChevronDown,
+  Backpack,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -35,12 +38,26 @@ const TourDetail = () => {
   const navigate = useNavigate();
   const { addItem, discountPercentage, referralUser } = useCart();
   const { data: tour, isLoading } = useTour(id || "");
+  const { data: extras = [] } = useTourExtras(id || "");
 
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [travelersOpen, setTravelersOpen] = useState(false);
+  const [selectedExtraIds, setSelectedExtraIds] = useState<Set<string>>(new Set());
+
+  const toggleExtra = (extraId: string) => {
+    setSelectedExtraIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(extraId)) {
+        next.delete(extraId);
+      } else {
+        next.add(extraId);
+      }
+      return next;
+    });
+  };
 
   if (isLoading) {
     return (
@@ -59,6 +76,9 @@ const TourDetail = () => {
     );
   }
 
+  const selectedExtras = extras.filter((extra) => selectedExtraIds.has(extra.id));
+  const extrasTotal = selectedExtras.reduce((sum, extra) => sum + extra.price, 0);
+
   const handleAddToCart = () => {
     if (!selectedDate) {
       toast.error("Por favor selecciona una fecha");
@@ -76,6 +96,7 @@ const TourDetail = () => {
       children,
       infants,
       date: format(selectedDate, "yyyy-MM-dd"),
+      extras: selectedExtras.map(({ id, name, price }) => ({ id, name, price })),
     });
 
     toast.success("Tour agregado al carrito");
@@ -86,12 +107,12 @@ const TourDetail = () => {
     (tour.priceAdult || 0) * adults +
     (tour.priceChild || 0) * children +
     (tour.priceInfant || 0) * infants;
-  
-  const discountAmount = discountPercentage > 0 
-    ? (subtotal * discountPercentage) / 100 
+
+  const discountAmount = discountPercentage > 0
+    ? (subtotal * discountPercentage) / 100
     : 0;
-  
-  const totalPrice = subtotal - discountAmount;
+
+  const totalPrice = subtotal - discountAmount + extrasTotal;
 
   const totalTravelers = adults + children + infants;
   const travelersSummary = () => {
@@ -365,8 +386,52 @@ const TourDetail = () => {
                   </p>
                 </div>
 
+                {/* Accesorios y recomendaciones */}
+                {extras.length > 0 && (
+                  <div className="space-y-2 pt-2 border-t">
+                    <span className="text-sm font-medium flex items-center gap-2 pt-2">
+                      <Backpack className="h-4 w-4" />
+                      Accesorios y recomendaciones
+                    </span>
+                    <div className="space-y-1">
+                      {extras.map((extra) => {
+                        const checked = selectedExtraIds.has(extra.id);
+                        return (
+                          <label
+                            key={extra.id}
+                            className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer transition-colors ${
+                              checked ? "border-primary bg-primary/5" : "hover:bg-muted"
+                            }`}
+                          >
+                            <Checkbox
+                              checked={checked}
+                              onCheckedChange={() => toggleExtra(extra.id)}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium leading-tight">{extra.name}</p>
+                              {extra.description && (
+                                <p className="text-xs text-muted-foreground mt-0.5">{extra.description}</p>
+                              )}
+                            </div>
+                            <span className="text-sm font-semibold text-primary shrink-0">
+                              +${extra.price.toFixed(2)}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* Price Summary */}
                 <div className="pt-4 border-t">
+                  {extrasTotal > 0 && (
+                    <div className="flex justify-between items-center mb-2 text-sm text-muted-foreground">
+                      <span>Accesorios ({selectedExtras.length})</span>
+                      <span>+${extrasTotal.toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-3xl font-bold text-primary">

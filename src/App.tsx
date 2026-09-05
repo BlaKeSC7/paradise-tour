@@ -14,6 +14,8 @@ import Cart from "./pages/Cart";
 import Categorias from "./pages/Categorias";
 import Ofertas from "./pages/Ofertas";
 import ComboDetail from "./pages/ComboDetail";
+import Nosotros from "./pages/Nosotros";
+import Contacto from "./pages/Contacto";
 import Dashboard from "./pages/Dashboard";
 import DashboardLogin from "./pages/DashboardLogin";
 import { ProtectedRoute } from "./components/Dashboard/ProtectedRoute";
@@ -87,6 +89,20 @@ const App = () => (
                 <>
                   <Navbar />
                   <ComboDetail />
+                  <WhatsAppFloat />
+                </>
+              } />
+              <Route path="/nosotros" element={
+                <>
+                  <Navbar />
+                  <Nosotros />
+                  <WhatsAppFloat />
+                </>
+              } />
+              <Route path="/contacto" element={
+                <>
+                  <Navbar />
+                  <Contacto />
                   <WhatsAppFloat />
                 </>
               } />
