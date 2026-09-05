@@ -110,27 +110,6 @@ export const dashboardUsersService = {
     return data;
   },
 
-  // Actualizar un usuario del dashboard
-  async update(
-    id: string,
-    updates: Partial<Omit<DashboardUser, 'id' | 'created_at' | 'updated_at'>>
-  ): Promise<DashboardUser | null> {
-    const { data, error } = await supabase
-      .from('dashboard_users')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select();
-
-    if (error) {
-      console.error('Error updating dashboard user:', error);
-      throw error;
-    }
-
-    // Al desactivar (is_active: false) la política RLS de lectura filtra la fila,
-    // así que data puede volver vacío aunque el UPDATE sí se haya aplicado.
-    return data?.[0] ?? null;
-  },
-
   // Actualizar estadísticas de un usuario
   async updateStats(id: string, stats: Partial<Pick<DashboardUser, 'total_referrals' | 'total_earnings'>>): Promise<DashboardUser> {
     const { data, error } = await supabase
