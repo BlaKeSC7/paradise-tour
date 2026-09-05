@@ -66,11 +66,13 @@ export const toursService = {
     return (data || []).map(adaptTourFromSupabase);
   },
 
-  // Crear un nuevo tour
-  async create(tourData: Omit<Tour, 'id' | 'created_at' | 'updated_at'>): Promise<Tour> {
+  // Crear un nuevo tour.
+  // La tabla `tours` tiene id TEXT PRIMARY KEY sin DEFAULT, así que hay que enviarlo sí o sí.
+  async create(tourData: Tour): Promise<Tour> {
     const { data, error } = await supabase
       .from('tours')
       .insert({
+        id: tourData.id,
         title: tourData.title,
         description: tourData.description,
         category: tourData.category,
