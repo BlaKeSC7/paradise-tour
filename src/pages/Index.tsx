@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 import { Hero } from "@/components/Hero";
 import { CategoryShowcase } from "@/components/CategoryShowcase";
 import { TourCard } from "@/components/TourCard";
@@ -16,8 +16,16 @@ import { CalendarCheck, BadgePercent, ShieldCheck } from "lucide-react";
 
 const Index = () => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [searchKeyword, setSearchKeyword] = useState("");
+
+  // React Router no hace scroll automático a anclas (#tours) como el HTML tradicional.
+  useEffect(() => {
+    if (location.hash === "#tours") {
+      document.getElementById("tours")?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [location]);
 
   // Deep link desde /categorias, ej. /?categoria=acuatico
   useEffect(() => {

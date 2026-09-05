@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useCart } from "@/contexts/CartContext";
@@ -397,17 +396,30 @@ const TourDetail = () => {
                       {extras.map((extra) => {
                         const checked = selectedExtraIds.has(extra.id);
                         return (
-                          <label
+                          <div
                             key={extra.id}
-                            className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer transition-colors ${
+                            role="checkbox"
+                            aria-checked={checked}
+                            tabIndex={0}
+                            onClick={() => toggleExtra(extra.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                toggleExtra(extra.id);
+                              }
+                            }}
+                            className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                               checked ? "border-primary bg-primary/5" : "hover:bg-muted"
                             }`}
                           >
-                            <Checkbox
-                              checked={checked}
-                              onCheckedChange={() => toggleExtra(extra.id)}
-                              className="mt-0.5"
-                            />
+                            <div
+                              aria-hidden="true"
+                              className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border border-primary ${
+                                checked ? "bg-primary text-primary-foreground" : ""
+                              }`}
+                            >
+                              {checked && <Check className="h-3.5 w-3.5" />}
+                            </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium leading-tight">{extra.name}</p>
                               {extra.description && (
@@ -417,7 +429,7 @@ const TourDetail = () => {
                             <span className="text-sm font-semibold text-primary shrink-0">
                               +${extra.price.toFixed(2)}
                             </span>
-                          </label>
+                          </div>
                         );
                       })}
                     </div>
