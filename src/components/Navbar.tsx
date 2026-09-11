@@ -33,7 +33,10 @@ export const Navbar = () => {
                   <div className="rounded-full bg-gradient-to-br from-primary to-secondary p-1.5">
                     <Waves className="h-4 w-4 text-white" />
                   </div>
-                  Paradise Tours
+                  <span className="flex flex-col items-center leading-tight">
+                    <span>Take Me On</span>
+                    <span>Tours</span>
+                  </span>
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-1 mt-8">
@@ -55,8 +58,9 @@ export const Navbar = () => {
             <div className="rounded-full bg-gradient-to-br from-primary to-secondary p-2">
               <Waves className="h-6 w-6 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Paradise Tours
+            <span className="flex flex-col items-center text-xl font-bold leading-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              <span>Take Me On</span>
+              <span>Tours</span>
             </span>
           </Link>
         </div>

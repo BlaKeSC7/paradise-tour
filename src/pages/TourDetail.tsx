@@ -44,18 +44,13 @@ const TourDetail = () => {
   const [infants, setInfants] = useState(0);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [travelersOpen, setTravelersOpen] = useState(false);
-  const [selectedExtraIds, setSelectedExtraIds] = useState<Set<string>>(new Set());
+  const [extraQuantities, setExtraQuantities] = useState<Record<string, number>>({});
 
-  const toggleExtra = (extraId: string) => {
-    setSelectedExtraIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(extraId)) {
-        next.delete(extraId);
-      } else {
-        next.add(extraId);
-      }
-      return next;
-    });
+  const setExtraQuantity = (extraId: string, quantity: number) => {
+    setExtraQuantities((prev) => ({
+      ...prev,
+      [extraId]: Math.max(0, Math.min(20, quantity)),
+    }));
   };
 
   if (isLoading) {
@@ -75,8 +70,11 @@ const TourDetail = () => {
     );
   }
 
-  const selectedExtras = extras.filter((extra) => selectedExtraIds.has(extra.id));
-  const extrasTotal = selectedExtras.reduce((sum, extra) => sum + extra.price, 0);
+  const selectedExtras = extras
+    .map((extra) => ({ ...extra, quantity: extraQuantities[extra.id] || 0 }))
+    .filter((extra) => extra.quantity > 0);
+  const extrasTotal = selectedExtras.reduce((sum, extra) => sum + extra.price * extra.quantity, 0);
+  const extrasCount = selectedExtras.reduce((sum, extra) => sum + extra.quantity, 0);
 
   const handleAddToCart = () => {
     if (!selectedDate) {
@@ -95,7 +93,7 @@ const TourDetail = () => {
       children,
       infants,
       date: format(selectedDate, "yyyy-MM-dd"),
-      extras: selectedExtras.map(({ id, name, price }) => ({ id, name, price })),
+      extras: selectedExtras.map(({ id, name, price, quantity }) => ({ id, name, price, quantity })),
     });
 
     toast.success("Tour agregado al carrito");
@@ -394,41 +392,58 @@ const TourDetail = () => {
                     </span>
                     <div className="space-y-1">
                       {extras.map((extra) => {
-                        const checked = selectedExtraIds.has(extra.id);
+                        const quantity = extraQuantities[extra.id] || 0;
                         return (
                           <div
                             key={extra.id}
-                            role="checkbox"
-                            aria-checked={checked}
-                            tabIndex={0}
-                            onClick={() => toggleExtra(extra.id)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                toggleExtra(extra.id);
-                              }
-                            }}
-                            className={`flex items-start gap-3 rounded-lg border p-3 cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                              checked ? "border-primary bg-primary/5" : "hover:bg-muted"
+                            className={`rounded-lg border p-3 transition-colors ${
+                              quantity > 0 ? "border-primary bg-primary/5" : ""
                             }`}
                           >
-                            <div
-                              aria-hidden="true"
-                              className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border border-primary ${
-                                checked ? "bg-primary text-primary-foreground" : ""
-                              }`}
-                            >
-                              {checked && <Check className="h-3.5 w-3.5" />}
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium leading-tight">{extra.name}</p>
+                                {extra.description && (
+                                  <p className="text-xs text-muted-foreground mt-0.5">{extra.description}</p>
+                                )}
+                                <p className="text-xs font-semibold text-primary mt-1">
+                                  ${extra.price.toFixed(2)} c/u
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="icon"
+                                  className="h-8 w-8 rounded-full"
+                                  onClick={() => setExtraQuantity(extra.id, quantity - 1)}
+                                  disabled={quantity <= 0}
+                                  aria-label={`Quitar ${extra.name}`}
+                                >
+                                  <Minus className="h-3.5 w-3.5" />
+                                </Button>
+                                <span className="w-5 text-center font-semibold tabular-nums">{quantity}</span>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="icon"
+                                  className="h-8 w-8 rounded-full"
+                                  onClick={() => setExtraQuantity(extra.id, quantity + 1)}
+                                  disabled={quantity >= 20}
+                                  aria-label={`Agregar ${extra.name}`}
+                                >
+                                  <Plus className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium leading-tight">{extra.name}</p>
-                              {extra.description && (
-                                <p className="text-xs text-muted-foreground mt-0.5">{extra.description}</p>
-                              )}
-                            </div>
-                            <span className="text-sm font-semibold text-primary shrink-0">
-                              +${extra.price.toFixed(2)}
-                            </span>
+                            {quantity > 0 && (
+                              <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
+                                {quantity} × ${extra.price.toFixed(2)} ={" "}
+                                <strong className="text-primary">
+                                  ${(extra.price * quantity).toFixed(2)}
+                                </strong>
+                              </p>
+                            )}
                           </div>
                         );
                       })}
@@ -440,7 +455,9 @@ const TourDetail = () => {
                 <div className="pt-4 border-t">
                   {extrasTotal > 0 && (
                     <div className="flex justify-between items-center mb-2 text-sm text-muted-foreground">
-                      <span>Accesorios ({selectedExtras.length})</span>
+                      <span>
+                        Accesorios ({extrasCount} {extrasCount === 1 ? "unidad" : "unidades"})
+                      </span>
                       <span>+${extrasTotal.toFixed(2)}</span>
                     </div>
                   )}

@@ -26,6 +26,8 @@ export interface SelectedExtra {
   id: string;
   name: string;
   price: number;
+  // Puede faltar en carritos guardados en localStorage antes de existir cantidades.
+  quantity?: number;
 }
 
 export interface CartItem {

@@ -61,10 +61,8 @@ export const referralsService = {
 
   // Actualizar estado de un referido
   async updateStatus(id: string, status: Referral['status']): Promise<Referral> {
-    const updateData: Partial<Referral> = {
-      status,
-      updated_at: new Date().toISOString(),
-    };
+    // La tabla `referrals` no tiene columna updated_at (solo created_at y paid_at).
+    const updateData: Partial<Referral> = { status };
 
     if (status === 'paid') {
       updateData.paid_at = new Date().toISOString();

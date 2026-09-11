@@ -44,7 +44,7 @@ const DashboardLogin = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Seo title="Acceso Administrador" description="Panel de administración de Paradise Tours." path="/dashboard/login" noIndex />
+      <Seo title="Acceso Administrador" description="Panel de administración de Take Me On Tours." path="/dashboard/login" noIndex />
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-2">
           <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">

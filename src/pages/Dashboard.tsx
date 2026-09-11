@@ -48,7 +48,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Seo title="Dashboard de Administración" description="Panel de administración de Paradise Tours." path="/dashboard" noIndex />
+      <Seo title="Dashboard de Administración" description="Panel de administración de Take Me On Tours." path="/dashboard" noIndex />
       {/* Header */}
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4">

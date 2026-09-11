@@ -91,7 +91,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, 0);
 
   const extrasSubtotal = items.reduce((sum, item) => {
-    const itemExtrasTotal = (item.extras || []).reduce((s, extra) => s + extra.price, 0);
+    const itemExtrasTotal = (item.extras || []).reduce(
+      (s, extra) => s + extra.price * (extra.quantity ?? 1),
+      0
+    );
     return sum + itemExtrasTotal;
   }, 0);
 

@@ -20,7 +20,7 @@ const Nosotros = () => {
     <div className="min-h-screen bg-background">
       <Seo
         title="Nosotros"
-        description="Conocé a Paradise Tours: operador local de excursiones en Punta Cana, República Dominicana."
+        description="Conocé a Take Me On Tours: operador local de excursiones en Punta Cana, República Dominicana."
         path="/nosotros"
       />
 
@@ -37,7 +37,7 @@ const Nosotros = () => {
       <div className="container mx-auto px-4 py-12 max-w-3xl">
         <div className="space-y-4 text-lg text-muted-foreground">
           <p>
-            Paradise Tours es un operador local de excursiones en{" "}
+            Take Me On Tours es un operador local de excursiones en{" "}
             <strong className="text-foreground">Punta Cana, República Dominicana</strong>. Armamos
             un catálogo de tours pensado para que reservar tu próxima aventura sea simple: elegís
             el tour, la fecha y la cantidad de personas, y nosotros coordinamos el resto.

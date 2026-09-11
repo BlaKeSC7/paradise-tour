@@ -49,7 +49,7 @@ const Cart = () => {
   };
 
   const getItemExtrasTotal = (item: (typeof items)[number]) =>
-    (item.extras || []).reduce((sum, extra) => sum + extra.price, 0);
+    (item.extras || []).reduce((sum, extra) => sum + extra.price * (extra.quantity ?? 1), 0);
 
   const getItemTotal = (item: (typeof items)[number]) =>
     item.tour.priceAdult * item.adults +
@@ -94,7 +94,12 @@ const Cart = () => {
         .map((item) => {
           const extrasText =
             item.extras && item.extras.length > 0
-              ? `\nAccesorios: ${item.extras.map((e) => `${e.name} (+$${e.price})`).join(", ")}`
+              ? `\nAccesorios: ${item.extras
+                  .map((e) => {
+                    const qty = e.quantity ?? 1;
+                    return `${qty}x ${e.name} (+$${(e.price * qty).toFixed(2)})`;
+                  })
+                  .join(", ")}`
               : "";
           return `*${item.tour.title}*\nFecha: ${item.date}\nAdultos: ${item.adults}, Niños: ${item.children}, Infantes: ${item.infants}${extrasText}\nSubtotal: $${getItemTotal(item)}`;
         })
@@ -122,7 +127,7 @@ const Cart = () => {
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Seo title="Carrito de Compras" description="Tu carrito de reservas en Paradise Tours." path="/carrito" noIndex />
+        <Seo title="Carrito de Compras" description="Tu carrito de reservas en Take Me On Tours." path="/carrito" noIndex />
         <div className="text-center space-y-4">
           <ShoppingBag className="h-24 w-24 text-muted-foreground mx-auto" />
           <h2 className="text-2xl font-bold">Tu carrito está vacío</h2>
@@ -139,7 +144,7 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen bg-background py-8">
-      <Seo title="Carrito de Compras" description="Tu carrito de reservas en Paradise Tours." path="/carrito" noIndex />
+      <Seo title="Carrito de Compras" description="Tu carrito de reservas en Take Me On Tours." path="/carrito" noIndex />
       <div className="container mx-auto px-4">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Carrito de Compras</h1>
@@ -189,12 +194,15 @@ const Cart = () => {
                         </div>
                         {item.extras && item.extras.length > 0 && (
                           <div className="text-sm text-muted-foreground space-y-0.5 pt-1 border-t">
-                            {item.extras.map((extra) => (
-                              <p key={extra.id} className="flex items-center gap-1">
-                                <Backpack className="h-3.5 w-3.5 shrink-0" />
-                                {extra.name} (+${extra.price.toFixed(2)})
-                              </p>
-                            ))}
+                            {item.extras.map((extra) => {
+                              const qty = extra.quantity ?? 1;
+                              return (
+                                <p key={extra.id} className="flex items-center gap-1">
+                                  <Backpack className="h-3.5 w-3.5 shrink-0" />
+                                  {qty} × {extra.name} (+${(extra.price * qty).toFixed(2)})
+                                </p>
+                              );
+                            })}
                           </div>
                         )}
                       </div>

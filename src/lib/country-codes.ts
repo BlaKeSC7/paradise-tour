@@ -5,7 +5,7 @@ export interface CountryCode {
   flag: string;
 }
 
-// Lista curada, con foco en Latinoamérica y el Caribe (mercado principal de Paradise Tours).
+// Lista curada, con foco en Latinoamérica y el Caribe (mercado principal de Take Me On Tours).
 export const countryCodes: CountryCode[] = [
   { iso2: "DO", name: "República Dominicana", dialCode: "+1", flag: "🇩🇴" },
   { iso2: "US", name: "Estados Unidos", dialCode: "+1", flag: "🇺🇸" },

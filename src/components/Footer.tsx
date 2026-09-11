@@ -8,7 +8,10 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold">Paradise Tours</h3>
+            <h3 className="inline-flex flex-col items-center text-xl font-bold leading-tight">
+              <span>Take Me On</span>
+              <span>Tours</span>
+            </h3>
             <p className="text-sm opacity-90">
               Tu mejor opción para explorar el paraíso. Experiencias inolvidables garantizadas.
             </p>
@@ -113,7 +116,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-primary-foreground/20 mt-8 pt-8 text-center text-sm">
-          <p>&copy; {new Date().getFullYear()} Paradise Tours. Created By SH Computers SRL</p>
+          <p>&copy; {new Date().getFullYear()} Take Me On Tours. Created By SH Computers SRL</p>
         </div>
       </div>
     </footer>

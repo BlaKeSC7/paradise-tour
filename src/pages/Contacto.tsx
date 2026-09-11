@@ -10,7 +10,7 @@ const Contacto = () => {
     <div className="min-h-screen bg-background">
       <Seo
         title="Contacto"
-        description="Contactá a Paradise Tours por WhatsApp, teléfono o email. Excursiones en Punta Cana, República Dominicana."
+        description="Contactá a Take Me On Tours por WhatsApp, teléfono o email. Excursiones en Punta Cana, República Dominicana."
         path="/contacto"
       />
 
